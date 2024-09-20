@@ -46,6 +46,7 @@ termination_by _ a b => b
 
 
 theorem gcd_nonneg (a b : ℤ) : 0 ≤ gcd a b := by
+  have H : fmod a b + b * fdiv a b = a := fmod_add_fdiv a b
   rw [gcd]
   split_ifs with h1 h2 ha <;> push_neg at *
   · -- case `0 < b`
@@ -69,29 +70,63 @@ theorem gcd_dvd (a b : ℤ) : gcd a b ∣ b ∧ gcd a b ∣ a := by
     obtain ⟨IH_right, IH_left⟩ := IH
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      set q := fdiv a b
+      set r := fmod a b
+      apply IH_left
     · -- prove that `gcd a b ∣ a`
-      sorry
+      have H : fmod a b + b * fdiv a b = a := fmod_add_fdiv a b
+      set q := fdiv a b
+      set r := fmod a b
+      obtain ⟨x, hx⟩ := IH_right
+      obtain ⟨y, hy⟩ := IH_left
+      use (x + q * y)
+      calc
+        a = r + b * q := by rw [H]
+        _ = gcd b r * x + b * q := by rw [← hx]
+        _ = gcd b r * x + (gcd b r * y) * q := by rw [← hy]
+        _ = gcd b r * (x + q * y) := by ring
   · -- case `b < 0`
     have IH : _ ∧ _ := gcd_dvd b (fmod a (-b)) -- inductive hypothesis
     obtain ⟨IH_right, IH_left⟩ := IH
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      set q := fdiv a (-b)
+      set r := fmod a (-b)
+      apply IH_left
     · -- prove that `gcd a b ∣ a`
-      sorry
+      have H : fmod a (-b) + (-b) * fdiv a (-b) = a := fmod_add_fdiv a (-b)
+      set q := fdiv a (-b)
+      set r := fmod a (-b)
+      obtain ⟨x, hx⟩ := IH_right
+      obtain ⟨y, hy⟩ := IH_left
+      use (x - q * y)
+      calc
+        a = r + -b * q := by rw [H]
+        _ = gcd b r * x + -b * q := by rw [← hx]
+        _ = gcd b r * x + (-(gcd b r * y)) * q := by rw [← hy]
+        _ = gcd b r * (x - q * y) := by ring
   · -- case `b = 0`, `0 ≤ a`
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      have hb : b = 0 := le_antisymm h1 h2
+      use 0
+      calc
+        b = 0 := hb
+        _ = a * 0 := by ring
     · -- prove that `gcd a b ∣ a`
-      sorry
+      use 1
+      ring
   · -- case `b = 0`, `a < 0`
     constructor
     · -- prove that `gcd a b ∣ b`
-      sorry
+      have hb : b = 0 := le_antisymm h1 h2
+      use 0
+      calc
+        b = 0 := hb
+        _ = -a * 0 := by ring
     · -- prove that `gcd a b ∣ a`
-      sorry
+      use (-1)
+      ring
 termination_by gcd_dvd a b => b
 
 
@@ -212,6 +247,14 @@ termination_by L_mul_add_R_mul a b => b
 #eval R 7 5 -- infoview displays `3`
 #eval gcd 7 5 -- infoview displays `1`
 
+#eval L 66 41
+#eval R 66 41
+#eval gcd 66 41 -- infoview displays `1`
+
+#eval L 101 33
+#eval R 101 33
+#eval gcd 101 33 -- infoview displays `1`
+
 
 theorem bezout (a b : ℤ) : ∃ x y : ℤ, x * a + y * b = gcd a b := by
   use L a b, R a b
@@ -221,4 +264,12 @@ theorem bezout (a b : ℤ) : ∃ x y : ℤ, x * a + y * b = gcd a b := by
 
 
 theorem gcd_maximal {d a b : ℤ} (ha : d ∣ a) (hb : d ∣ b) : d ∣ gcd a b := by
-  sorry
+  have H := bezout a b
+  obtain ⟨x, y, hxy⟩ := H
+  obtain ⟨v, hv⟩ := ha
+  obtain ⟨w, hw⟩ := hb
+  use (x * v + y * w)
+  calc
+    gcd a b = x * a + y * b := by rw [hxy]
+    _ = x * (d * v) + y * (d * w) := by rw [hv, hw]
+    _ = d * (x * v + y * w) := by ring

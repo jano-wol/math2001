@@ -81,12 +81,41 @@ example (a b : ℕ) : (pascal a b : ℚ) = (a + b)! / (a ! * b !) := by
 
 theorem pascal_symm (m n : ℕ) : pascal m n = pascal n m := by
   match m, n with
-  | 0, 0 => sorry
-  | a + 1, 0 => sorry
-  | 0, b + 1 => sorry
-  | a + 1, b + 1 => sorry
+  | 0, 0 =>
+    ring
+  | a + 1, 0 =>
+    have p1 : pascal (a + 1) 0 = 1 := by rw [pascal]
+    have p2 : pascal 0 (a + 1) = 1 := by rw [pascal]
+    calc
+      pascal (a + 1) 0 = 1 := p1
+      _ = pascal 0 (a + 1) := by rw [p2]
+  | 0, b + 1 =>
+    have p1 : pascal (b + 1) 0 = 1 := by rw [pascal]
+    have p2 : pascal 0 (b + 1) = 1 := by rw [pascal]
+    calc
+      pascal (b + 1) 0 = 1 := p1
+      _ = pascal 0 (b + 1) := by rw [p2]
+  | a + 1, b + 1 =>
+    have p1 : pascal a (b + 1) = pascal (b + 1) a := pascal_symm a (b + 1)
+    have p2 : pascal (a + 1) b = pascal b (a + 1) := pascal_symm (a + 1) b
+    calc
+      pascal (a + 1) (b + 1) = pascal (a + 1) b + pascal a (b + 1) := by rw [pascal]
+      _ = pascal b (a + 1) + pascal (b + 1) a := by rw [p1, p2]
+      _ = pascal (b + 1) a + pascal b (a + 1) := by ring
+      _ = pascal (b + 1) (a + 1) := by rw [pascal]
 termination_by _ a b => a + b
 
 
 example (a : ℕ) : pascal a 1 = a + 1 := by
-  sorry
+  simple_induction a with k IH
+  rw [pascal]
+  have h : pascal (k + 1) (0 + 1) = pascal (k + 1) 0 + pascal k (0 + 1) := by
+    rw [pascal]
+    rw [pascal]
+    rw [pascal]
+  calc
+    pascal (k + 1) 1 = pascal (k + 1) (0 + 1) := by ring
+    _ = pascal (k + 1) 0 + pascal k (0 + 1) := h
+    _ = 1 + pascal k 1 := by rw [pascal]
+    _ = 1 + (k + 1) := by rw [IH]
+    _ = k + 1 + 1 := by ring

@@ -40,7 +40,7 @@ theorem exists_prime_factor {n : ℕ} (hn2 : 2 ≤ n) : ∃ p : ℕ, Prime p ∧
     · use 1
       ring
   . -- case 2: `n` is not prime
-    obtain ⟨m, hmn, _, ⟨x, hx⟩⟩ := exists_factor_of_not_prime hn hn2
+    obtain ⟨m, hmn, tt, ⟨x, hx⟩⟩ := exists_factor_of_not_prime hn hn2
     have IH : ∃ p, Prime p ∧ p ∣ m := exists_prime_factor hmn -- inductive hypothesis
     obtain ⟨p, hp, y, hy⟩ := IH
     use p
@@ -55,4 +55,25 @@ theorem exists_prime_factor {n : ℕ} (hn2 : 2 ≤ n) : ∃ p : ℕ, Prime p ∧
 
 
 theorem extract_pow_two (n : ℕ) (hn : 0 < n) : ∃ a x, Odd x ∧ n = 2 ^ a * x := by
-  sorry
+  obtain parity | parity := Nat.even_or_odd n
+  obtain ⟨m, hm⟩ := parity
+  have hmn2: 2 * m > 2 * 0 := by
+    calc
+    2 * m = n := by addarith [hm]
+    _ > 0 := hn
+  cancel 2 at hmn2
+  have IH : ∃ a x, Odd x ∧ m = 2 ^ a * x := extract_pow_two m hmn2
+  obtain ⟨a, b, c, d⟩ := IH
+  use (a + 1)
+  use b
+  constructor
+  apply c
+  calc
+    n = 2 * m := hm
+    _ = 2 * (2 ^ a * b) := by rw [d]
+    _ = 2 ^ (a + 1) * b := by ring
+  use 0
+  use n
+  constructor
+  apply parity
+  ring
