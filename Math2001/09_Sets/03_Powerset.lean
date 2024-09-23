@@ -14,7 +14,7 @@ open Set Function
 
 #check {{3, 4}, {4, 5, 6}} -- `{{3, 4}, {4, 5, 6}} : Set (Set ℕ)`
 #check {s : Set ℕ | 3 ∈ s} -- `{s | 3 ∈ s} : Set (Set ℕ)`
-
+#check {{{3, 4}, {4, 5, 6}}, ∅, {∅}}
 
 
 example : {n : ℕ | Nat.Even n} ∉ {s : Set ℕ | 3 ∈ s} := by
@@ -79,7 +79,37 @@ example : ¬ ∃ f : X → Set X, Surjective f := by
 def r (s : Set ℕ) : Set ℕ := s ∪ {3}
 
 example : ¬ Injective r := by
-  sorry
+  dsimp [Injective]
+  push_neg
+  use ∅, {3}
+  constructor
+  dsimp [r]
+  ext n
+  constructor
+  intro h
+  have h1 : n = 3 := by
+    exact (false_or_iff (n = 3)).mp h
+  exact mem_insert_of_mem 3 h1
+  dsimp
+  intro h
+  right
+  obtain h | h := h
+  exact h
+  exact h
+  ext
+  dsimp
+  push_neg
+  use 3
+  right
+  constructor
+  exact not_false
+  numbers
+
+
+
+
+
+
 
 namespace Int
 
@@ -90,8 +120,39 @@ def U : ℕ → Set ℤ
 example (n : ℕ) : U n = {x : ℤ | (2:ℤ) ^ n ∣ x} := by
   simple_induction n with k hk
   · rw [U]
-    sorry
+    ext n
+    constructor
+    intro h
+    dsimp
+    use n
+    ring
+    intro h
+    exact trivial
   · rw [U]
     ext x
     dsimp
-    sorry
+    constructor
+    intro h
+    obtain ⟨y, hy⟩ := h
+    obtain ⟨h2, h3⟩ := hy
+    have hr : y ∈ {x | 2 ^ k ∣ x} := by
+      rw [← hk]
+      exact h2
+    dsimp at hr
+    obtain ⟨l, hl⟩ := hr
+    use l
+    calc
+      x = 2 * y := h3
+      _ = 2 * (2 ^ k * l) := by rw [hl]
+      _ = 2 ^ (k + 1) * l := by ring
+    intro h
+    obtain ⟨l, hl⟩ := h
+    use l * 2 ^ k
+    constructor
+    rw [hk]
+    dsimp
+    use l
+    ring
+    calc
+      x = 2 ^ (k + 1) * l := hl
+      _ = 2 * (l * 2 ^ k) := by ring
