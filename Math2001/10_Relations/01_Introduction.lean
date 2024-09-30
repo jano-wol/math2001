@@ -171,13 +171,29 @@ end
 
 
 example : ¬ Symmetric ((·:ℝ) < ·) := by
-  sorry
+  dsimp [Symmetric]
+  push_neg
+  use 0, 1
+  constructor
+  numbers
+  numbers
 
 section
 local infix:50 "∼" => fun (x y : ℤ) ↦ x ≡ y [ZMOD 2]
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
+  dsimp [AntiSymmetric]
+  push_neg
+  use 0, 2
+  constructor
+  calc
+    0 = 2 + 2 * (-1) := by ring
+    _ ≡ 2 [ZMOD 2] := by extra
+  constructor
+  calc
+    2 = 0 + 2 * (1) := by ring
+    _ ≡ 0 [ZMOD 2] := by extra
+  numbers
 
 end
 
@@ -217,10 +233,16 @@ example : Reflexive (· ∼ ·) := by
   sorry
 
 example : ¬ Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  push_neg
+  use beth
+  exhaust
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro x y hxy
+  cases x <;> cases y <;> exhaust
+
 
 example : ¬ Symmetric (· ∼ ·) := by
   sorry
@@ -229,13 +251,19 @@ example : AntiSymmetric (· ∼ ·) := by
   sorry
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
+  dsimp [AntiSymmetric]
+  push_neg
+  use meg, jo
+  exhaust
 
 example : Transitive (· ∼ ·) := by
   sorry
 
 example : ¬ Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  push_neg
+  use jo, beth, amy
+  exhaust
 
 end
 
@@ -247,16 +275,40 @@ example : Reflexive (· ∼ ·) := by
   sorry
 
 example : ¬ Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro hx
+  have h : 0 ≡ 0 + 1 [ZMOD 5] := hx (0 : ℤ)
+  numbers at h
 
 example : Symmetric (· ∼ ·) := by
   sorry
 
 example : ¬ Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  push_neg
+  use 0, 1
+  constructor
+  numbers
+  intro hx
+  numbers at hx
+
 
 example : AntiSymmetric (· ∼ ·) := by
-  sorry
+  dsimp [AntiSymmetric]
+  push_neg
+  intro x y h1 h2
+  have h : x ≡ x + 2 [ZMOD 5] := by
+    calc
+      x ≡ y + 1 [ZMOD 5] := h2
+      _ ≡ (x + 1) + 1 [ZMOD 5] := by rel [h1]
+      _ = x + 2 := by ring
+  have h2 : 0 ≡ 2 [ZMOD 5] := by
+    calc
+      0 = x + 2 - (x + 2) := by ring
+      _ ≡ x + 2 - x [ZMOD 5] := by rel [h]
+      _ = 2 := by ring
+  numbers at h2
+
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
   sorry
@@ -265,7 +317,14 @@ example : Transitive (· ∼ ·) := by
   sorry
 
 example : ¬ Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  push_neg
+  use 0, 1, 2
+  constructor
+  numbers
+  constructor
+  numbers
+  numbers
 
 end
 
@@ -277,10 +336,17 @@ example : Reflexive (· ∼ ·) := by
   sorry
 
 example : ¬ Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  push_neg
+  use 1
+  numbers
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro x y h
+  calc
+    y + x = x + y := by ring
+    _ ≡ 0 [ZMOD 3] := by rel [h]
 
 example : ¬ Symmetric (· ∼ ·) := by
   sorry
@@ -289,19 +355,44 @@ example : AntiSymmetric (· ∼ ·) := by
   sorry
 
 example : ¬ AntiSymmetric (· ∼ ·) := by
-  sorry
+  dsimp [AntiSymmetric]
+  push_neg
+  use 1, 2
+  constructor
+  calc
+    1 + 2 = 0 + 3 * 1 := by ring
+    _ ≡ 0 [ZMOD 3] := by extra
+  constructor
+  calc
+    2 + 1 = 0 + 3 * 1 := by ring
+    _ ≡ 0 [ZMOD 3] := by extra
+  numbers
 
 example : Transitive (· ∼ ·) := by
   sorry
 
 example : ¬ Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  push_neg
+  use 1, 2, 1
+  constructor
+  calc
+    1 + 2 = 0 + 3 * 1 := by ring
+    _ ≡ 0 [ZMOD 3] := by extra
+  constructor
+  calc
+    2 + 1 = 0 + 3 * 1 := by ring
+    _ ≡ 0 [ZMOD 3] := by extra
+  numbers
 
 end
 
 
 example : Reflexive ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  dsimp [Reflexive]
+  dsimp [Set.subset_def]
+  intro t h h2
+  apply h2
 
 example : ¬ Reflexive ((· : Set ℕ) ⊆ ·) := by
   sorry
@@ -310,16 +401,47 @@ example : Symmetric ((· : Set ℕ) ⊆ ·) := by
   sorry
 
 example : ¬ Symmetric ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  dsimp [Symmetric]
+  push_neg
+  use {1}, {1, 2}
+  constructor
+  dsimp [Set.subset_def]
+  intro h1 h2
+  left
+  apply h2
+  dsimp [Set.subset_def]
+  push_neg
+  use 2
+  constructor
+  right
+  numbers
+  numbers
+
 
 example : AntiSymmetric ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  dsimp [AntiSymmetric]
+  intro x y h1 h2
+  ext e
+  constructor
+  intro h3
+  have h4 : e ∈ y := h1 h3
+  apply h4
+  intro h3
+  have h4 : e ∈ x := h2 h3
+  apply h4
+
+
 
 example : ¬ AntiSymmetric ((· : Set ℕ) ⊆ ·) := by
   sorry
 
 example : Transitive ((· : Set ℕ) ⊆ ·) := by
-  sorry
+  dsimp [Transitive]
+  intro x y z h1 h2
+  intro e he
+  have h3 : e ∈ y := h1 he
+  have h4 : e ∈ z := h2 h3
+  apply h4
 
 example : ¬ Transitive ((· : Set ℕ) ⊆ ·) := by
   sorry
@@ -330,7 +452,11 @@ section
 local infix:50 "≺" => fun ((x1, y1) : ℝ × ℝ) (x2, y2) ↦ (x1 ≤ x2 ∧ y1 ≤ y2)
 
 example : Reflexive (· ≺ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro x
+  constructor
+  extra
+  extra
 
 example : ¬ Reflexive (· ≺ ·) := by
   sorry
@@ -339,16 +465,47 @@ example : Symmetric (· ≺ ·) := by
   sorry
 
 example : ¬ Symmetric (· ≺ ·) := by
-  sorry
+  dsimp [Symmetric]
+  push_neg
+  use (0, 0), (1, 1)
+  constructor
+  constructor
+  numbers
+  numbers
+  left
+  numbers
 
 example : AntiSymmetric (· ≺ ·) := by
-  sorry
+  dsimp [AntiSymmetric]
+  intro (a1, a2) (b1, b2) h1 h2
+  obtain ⟨h3, h4⟩ := h1
+  obtain ⟨h5, h6⟩ := h2
+  dsimp at *
+  constructor
+  apply le_antisymm
+  apply h3
+  apply h5
+  apply le_antisymm
+  apply h4
+  apply h6
+
 
 example : ¬ AntiSymmetric (· ≺ ·) := by
   sorry
 
 example : Transitive (· ≺ ·) := by
-  sorry
+  dsimp [Transitive]
+  intro (a1, a2) (b1, b2) (c1, c2) h1 h2
+  obtain ⟨h3, h4⟩ := h1
+  obtain ⟨h5, h6⟩ := h2
+  dsimp at *
+  constructor
+  calc
+    a1 ≤ b1 := h3
+    _ ≤ c1 := h5
+  calc
+    a2 ≤ b2 := h4
+    _ ≤ c2 := h6
 
 example : ¬ Transitive (· ≺ ·) := by
   sorry
