@@ -168,13 +168,46 @@ section
 local infix:50 "∼" => fun (a b : ℤ) ↦ ∃ m n, m > 0 ∧ n > 0 ∧ a * m = b * n
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro x
+  use 1, 1
+  constructor
+  numbers
+  constructor
+  numbers
+  ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro x y h1
+  obtain ⟨m1, n1, h2⟩ := h1
+  obtain ⟨h3, h4, h5⟩ := h2
+  use n1, m1
+  constructor
+  apply h4
+  constructor
+  apply h3
+  rw [h5]
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  intro x y z h1 h2
+  obtain ⟨m1, n1, h3⟩ := h1
+  obtain ⟨m2, n2, h4⟩ := h2
+  obtain ⟨h5, h6, h7⟩ := h3
+  obtain ⟨h8, h9, h10⟩ := h4
+  use m1 * m2, n1 * n2
+  constructor
+  extra
+  constructor
+  extra
+  calc
+    x * (m1 * m2) = (x * m1) * m2 := by ring
+    _ = (y * n1) * m2 := by rw [h7]
+    _ = (y * m2) * n1 := by ring
+    _ = (z * n2) * n1 := by rw [h10]
+    _ = z * (n1 * n2) := by ring
+
 
 end
 
@@ -183,13 +216,29 @@ section
 local infix:50 "∼" => fun ((a, b) : ℕ × ℕ) (c, d) ↦ a + d = b + c
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro x
+  ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro x y h1
+  calc
+    y.1 + x.2 = x.2 + y.1 := by ring
+    _ = x.1 + y.2 := by rw [h1]
+    _ = y.2 + x.1 := by ring
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  intro x y z h1 h2
+  zify
+  have h : x.1 + z.2 + (y.1 + y.2) = x.2 + z.1 + (y.1 + y.2) := by
+    calc
+      x.1 + z.2 + (y.1 + y.2) = (x.1 + y.2) + (y.1 + z.2) := by ring
+      _ = (x.2 + y.1) + (y.2 + z.1) := by rw [h1, h2]
+      _ = x.2 + z.1 + (y.1 + y.2) := by ring
+  zify at h
+  addarith [h]
 
 end
 
@@ -199,12 +248,44 @@ local infix:50 "∼" => fun ((a, b) : ℤ × ℤ) (c, d) ↦
   ∃ m n, m > 0 ∧ n > 0 ∧ m * b * (b ^ 2 - 3 * a ^ 2) = n * d * (d ^ 2 - 3 * c ^ 2)
 
 example : Reflexive (· ∼ ·) := by
-  sorry
+  dsimp [Reflexive]
+  intro x
+  use 1, 1
+  constructor
+  numbers
+  constructor
+  numbers
+  ring
 
 example : Symmetric (· ∼ ·) := by
-  sorry
+  dsimp [Symmetric]
+  intro x y h1
+  obtain ⟨m1, n1, h2⟩ := h1
+  obtain ⟨h3, h4, h5⟩ := h2
+  use n1, m1
+  constructor
+  apply h4
+  constructor
+  apply h3
+  rw [h5]
 
 example : Transitive (· ∼ ·) := by
-  sorry
+  dsimp [Transitive]
+  intro x y z h1 h2
+  obtain ⟨m1, n1, h3⟩ := h1
+  obtain ⟨m2, n2, h4⟩ := h2
+  obtain ⟨h5, h6, h7⟩ := h3
+  obtain ⟨h8, h9, h10⟩ := h4
+  use m1 * m2, n1 * n2
+  constructor
+  extra
+  constructor
+  extra
+  calc
+    m1 * m2 * x.2 * (x.2 ^ 2 - 3 * x.1 ^ 2) = (m1 * x.2 * (x.2 ^ 2 - 3 * x.1 ^ 2)) * m2 := by ring
+    _ = (n1 * y.2 * (y.2 ^ 2 - 3 * y.1 ^ 2)) * m2 := by rw [h7]
+    _ = (m2 * y.2 * (y.2 ^ 2 - 3 * y.1 ^ 2)) * n1 := by ring
+    _ = (n2 * z.2 * (z.2 ^ 2 - 3 * z.1 ^ 2)) * n1 := by rw [h10]
+    _ = n1 * n2 * z.2 * (z.2 ^ 2 - 3 * z.1 ^ 2) := by ring
 
 end
